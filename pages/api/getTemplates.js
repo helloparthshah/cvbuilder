@@ -5,6 +5,6 @@ export default async function handler(req, res) {
     const db = client.db("TexquisiteCV");
     const collection = db.collection("templates");
 
-    const templates = await collection.find({}).toArray();
+    const templates = await collection.find({ approved: true }).toArray();
     res.json(templates);
 }
