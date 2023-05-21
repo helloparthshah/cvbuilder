@@ -1,3 +1,4 @@
+import ResumeForm from "@/components/ResumeForm"
 import GetRepo from "@/components/getRepo"
 import LoginBar from "@/components/loginBar"
 import Head from "next/head"
@@ -42,6 +43,19 @@ export default function Home() {
             </Head>
             <LoginBar />
             <GetRepo token={token} />
+            <ResumeForm token={token} user={user} template={{
+                "config": {
+                    "id": "test-resume-template",
+                    "name": "Resume template for testing",
+                    "description": "This is a test template used to tests the features for cvbuilder",
+                    "tags": [
+                        "test"
+                    ],
+                    "image": "image.png",
+                    "path": "resume/resume.tex"
+                }
+
+            }} />
         </>
     )
 }
