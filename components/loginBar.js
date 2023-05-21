@@ -88,7 +88,7 @@ export default function LoginBar() {
                             href={"https://github.com/login/oauth/authorize?" + new URLSearchParams({
                                 client_id: process.env.GITHUB_OAUTH_CLIENT_ID,
                                 redirect_uri: process.env.GITHUB_OAUTH_REDIRECT_URL,
-                                scope: "public_repo",
+                                scope: "public_repo actions:read",
                                 state: "1234567890"
                             }).toString()}
                         >

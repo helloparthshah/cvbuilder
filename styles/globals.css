@@ -3,7 +3,6 @@ body {
   padding: 0;
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
-  height: 100vh;
   background: url('https://material-kit-pro-react.devias.io/assets/gradient-bg.svg');
   background-size: cover;
   background-position: center;
