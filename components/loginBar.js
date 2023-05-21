@@ -84,7 +84,7 @@ export default function LoginBar() {
                             }
                         </div>
                         :
-                        <Button variant="filled"
+                        <Button variant="contained" color="secondary"
                             href={"https://github.com/login/oauth/authorize?" + new URLSearchParams({
                                 client_id: process.env.GITHUB_OAUTH_CLIENT_ID,
                                 redirect_uri: process.env.GITHUB_OAUTH_REDIRECT_URL,
