@@ -3,4 +3,10 @@ body {
   padding: 0;
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
+  height: 100vh;
+  background: url('https://rare-gallery.com/uploads/posts/585390-abstract-background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }

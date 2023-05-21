@@ -48,9 +48,9 @@ export default function LoginBar() {
             <AppBar position="static">
                 <Toolbar>
                     <Box sx={{ flexGrow: 1 }}>
-                        <Link href="/">
-                            CVBuilder
-                        </Link>
+                        <h2>
+                            TexquisiteCV
+                        </h2>
                     </Box>
                     {accessToken ?
                         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>

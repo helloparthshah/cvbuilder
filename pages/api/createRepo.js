@@ -1,6 +1,29 @@
 import { processLatexToAstViaUnified } from "@unified-latex/unified-latex";
 import { toString } from "@unified-latex/unified-latex-util-to-string";
 
+async function checkRepoStatus(repoName, user, token) {
+    // get commits for the repo
+    let status = await fetch(
+        `https://api.github.com/repos/${user}/${repoName}/commits`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    )
+        .then((res) => res.json())
+        .then((data) => {
+            if (data.message) {
+                return false;
+            }
+            return true;
+        });
+    return status;
+}
+
 function createListItem(example, item) {
     let template = JSON.parse(JSON.stringify(example))
     let keys = Object.keys(item)
@@ -11,9 +34,6 @@ function createListItem(example, item) {
         if (template[i].type == "environment") {
             if (keys.includes(template[i].env)) {
                 template[i].type = "string"
-                // console.log(JSON.stringify(template[i], null, 2))
-                // let content = template[i].content[0]
-                // content.content = [item[template[i].env]]
                 template[i].content = item[template[i].env]
             }
         }
@@ -24,22 +44,11 @@ function createListItem(example, item) {
             case "environment":
             case "group":
             case "argument":
-                let newContent = []
                 template[i].content = createListItem(template[i].content, item)
-            /* for (let j = 0; j < template[i].content.length; j++) {
-                newContent[j] = createListItem(template[i].content[j], item)
-            }
-            template[i].content = newContent */
             case "macro":
                 if (template[i].args && template[i].args.length > 0) {
-                    console.log(template[i].args[3])
                     template[i].args = createListItem(template[i].args, item)
                 }
-            /* if (template[i].args && template[i].args.length > 0) {
-                for (let j = 0; j < template[i].args.length; j++) {
-                    template[i].args[j] = createListItem(template[i].args[j].content, item)
-                }
-            } */
             default:
                 break;
         }
@@ -56,9 +65,13 @@ function replaceAst(ast, formData) {
         if (keys.includes(ast.env)) {
             if (Array.isArray(formData[ast.env])) {
                 let template = ast.content
-                ast.content = formData[ast.env].map((item) => {
+                let newContent = formData[ast.env].map((item) => {
                     return createListItem(template, item)
                 })
+                // remove the environment and replace it with the new content
+                // using root type breaks the latex parser
+                // using group adds extra curly braces
+                ast.content = newContent
             } else {
                 ast.type = "string"
                 ast.content = formData[ast.env]
@@ -83,13 +96,58 @@ function replaceAst(ast, formData) {
 }
 
 export default async function handler(req, res) {
-    let username = req.body.username;
-    let token = req.body.accessToken;
-    let config = req.body.config;
-    let formData = req.body.formData
+    const username = req.body.username;
+    const token = req.body.accessToken;
+    const config = req.body.config;
+    const formData = req.body.formData
+    const repoOwner = req.body.repoOwner;
+    const repoName = req.body.repoName;
+    const cloneName = req.body.cloneName;
 
-    let newAst = await fetch(
-        `https://api.github.com/repos/${username}/${formData.repo_name}/contents/${config.path}`,
+    let repo = await fetch(
+        `https://api.github.com/repos/${repoOwner}/${repoName}/generate`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                owner: username,
+                name: cloneName,
+                description: "Resume created using CVBuilder",
+                include_all_branches: false,
+                private: false,
+            }),
+        }
+    )
+        .then((res) => res.json())
+        .then((data) => {
+            return data;
+        });
+    if (repo.message) {
+        repo = await fetch(
+            `https://api.github.com/repos/${username}/${cloneName}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        )
+            .then((res) => res.json())
+            .then((data) => {
+                return data;
+            });
+    }
+    while (!(await checkRepoStatus(cloneName, username, token))) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+    let file = await fetch(
+        `https://api.github.com/repos/${username}/${cloneName}/contents/${config.path}`,
         {
             method: "GET",
             headers: {
@@ -102,16 +160,39 @@ export default async function handler(req, res) {
             if (file.message) {
                 return res.status(500).json({ error: file.message });
             }
-            let content = Buffer.from(file.content, "base64").toString("ascii");
-            let parser = processLatexToAstViaUnified();
-            // print this ast using pretty print
-            let ast = parser.parse(content);
-            ast = replaceAst(ast, formData);
-            ast = toString(ast);
-            Object.keys(formData).forEach((key) => {
-                ast = `\\newenvironment{${key}}{}{}\n` + ast;
-            });
-            return ast;
+            return file;
         });
-    return res.status(200).json(newAst);
+
+    let content = Buffer.from(file.content, "base64").toString("ascii");
+    let parser = processLatexToAstViaUnified();
+    let ast = parser.parse(content);
+    ast = replaceAst(ast, formData);
+    ast = toString(ast);
+
+    /* Object.keys(formData).forEach((key) => {
+        ast = `\\newenvironment{${key}}{}{}\n` + ast;
+    }); */
+
+    await fetch(
+        `https://api.github.com/repos/${username}/${cloneName}/contents/${config.path}`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                message: "Update resume content",
+                content: Buffer.from(ast).toString("base64"),
+                sha: file.sha,
+            }),
+        }
+    )
+        .then((res) => res.json())
+        .then((data) => { 
+            console.log(data);
+        });
+    // return res.status(200).json(ast);
+    return res.status(200).json({ status: "success" });
 }
