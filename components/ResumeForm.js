@@ -117,6 +117,7 @@ export default function ResumeForm({ accessToken, user, template, open, setOpen 
                             onChange={(e) => setRepoOwner(e.target.value)}
                             disabled
                             required
+                            style={{ margin: "8px 0px" }}
                         />
                         <TextField
                             fullWidth
@@ -126,6 +127,7 @@ export default function ResumeForm({ accessToken, user, template, open, setOpen 
                             onChange={(e) => setRepoName(e.target.value)}
                             disabled
                             required
+                            style={{ margin: "8px 0px" }}
                         />
                         <TextField
                             fullWidth
@@ -134,6 +136,7 @@ export default function ResumeForm({ accessToken, user, template, open, setOpen 
                             value={cloneName}
                             onChange={(e) => setCloneName(e.target.value)}
                             required
+                            style={{ margin: "8px 0px" }}
                         />
                         {
                             Object.keys(formState).map((key, index) => {
@@ -203,6 +206,7 @@ export default function ResumeForm({ accessToken, user, template, open, setOpen 
                                                                                 value={item[k]}
                                                                                 multiline={type === "textarea"}
                                                                                 rows={type === "textarea" ? 3 : undefined}
+                                                                                style={{ margin: "8px 0px" }}
                                                                                 inputProps={{
                                                                                     type: type,
                                                                                     step: type === "number" ? "0.1" : undefined,
@@ -250,6 +254,7 @@ export default function ResumeForm({ accessToken, user, template, open, setOpen 
                                             multiline={type === "textarea"}
                                             rows={type === "textarea" ? 3 : undefined}
                                             value={formState[key]}
+                                            style={{ margin: "8px 0px" }}
                                             onChange={(e) => {
                                                 setFormState({
                                                     ...formState,
