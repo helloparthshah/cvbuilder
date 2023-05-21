@@ -22,7 +22,7 @@ export default function Templates({ user, token }) {
                         <Card sx={{ p: 2 }} variant="outlined">
                             <h2>{template.name}</h2>
                             <p>{template.description}</p>
-                            <Button variant="contained" color="secondary" onClick={() => {
+                            <Button variant="contained" onClick={() => {
                                 console.log(template)
                                 fetch("/api/getRepo", {
                                     method: "POST",

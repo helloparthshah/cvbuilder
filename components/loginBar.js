@@ -45,18 +45,27 @@ export default function LoginBar() {
 
     return (
         <Box sx={{ flexGrow: 1 }}>
-            <AppBar position="static">
+            <AppBar position="static"
+                style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.4)",
+                    backdropFilter: "blur(6px)",
+                    boxShadow: "rgba(0, 0, 0, 0.08) 0px 3px 14px",
+                    borderRadius: "50px",
+                    transform: "translateY(10px)",
+                }}>
                 <Toolbar>
                     <Box sx={{ flexGrow: 1 }}>
-                        <Link href="/" style={{ textDecoration: "none", color: "white" }}>
-                            <h2>
-                                TexquisiteCV
-                            </h2>
-                        </Link>
+                        <div style={{ width: "fit-content" }}>
+                            <Link href="/" style={{ textDecoration: "none", color: "black" }}>
+                                <h2>
+                                    TexquisiteCV
+                                </h2>
+                            </Link>
+                        </div>
                     </Box>
                     {accessToken ?
                         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                            <Button variant="filled" onClick={() => {
+                            <Button variant="contained" color="secondary" onClick={() => {
                                 localStorage.removeItem("accessToken")
                                 localStorage.removeItem("user")
                                 setAccessToken(null)

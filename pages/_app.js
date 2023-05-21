@@ -8,7 +8,32 @@ import { useRouter } from 'next/router';
 const darkTheme = createTheme({
     palette: {
         mode: 'light',
+        primary: {
+            main: 'rgb(17, 25, 39)',
+            light: 'rgb(17, 25, 39)',
+        },
+        secondary: {
+            main: 'rgb(99, 102, 241)',
+        },
+        contrastThreshold: 3,
+        tonalOffset: 0.2,
     },
+    components: {
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    borderRadius: "50px"
+                }
+            }
+        },
+        MuiTextField: {
+            styleOverrides: {
+                root: {
+                    borderRadius: "50px"
+                }
+            }
+        },
+    }
 });
 
 export default function App({ Component, pageProps }) {
@@ -41,8 +66,8 @@ export default function App({ Component, pageProps }) {
     }, [])
     return (
         <>
-            <LoginBar />
             <ThemeProvider theme={darkTheme}>
+                <LoginBar />
                 <CssBaseline />
                 <Container sx={{ mb: 10, mt: 10 }}>
                     <Component {...pageProps} token={token} user={user} />
