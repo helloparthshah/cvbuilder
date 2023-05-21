@@ -163,7 +163,7 @@ export default async function handler(req, res) {
             return file;
         });
 
-    let content = Buffer.from(file.content, "base64").toString("ascii");
+    let content = Buffer.from(file.content, "base64").toString("utf-8");
     let parser = processLatexToAstViaUnified();
     let ast = parser.parse(content);
     ast = replaceAst(ast, formData);
@@ -190,7 +190,7 @@ export default async function handler(req, res) {
         }
     )
         .then((res) => res.json())
-        .then((data) => { 
+        .then((data) => {
             console.log(data);
         });
     // return res.status(200).json(ast);
