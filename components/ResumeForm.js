@@ -4,7 +4,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { LoadingButton } from "@mui/lab";
 
-export default function ResumeForm({ accessToken, user, template, open, setOpen, update, setUpdate }) {
+export default function ResumeForm({ accessToken, user, template, open, setOpen }) {
     const [loading, setLoading] = useState(false)
     const [sample, setSample] = useState({})
     const [formState, setFormState] = useState({})
@@ -106,7 +106,6 @@ export default function ResumeForm({ accessToken, user, template, open, setOpen,
                                         alert(data.error)
                                     } else {
                                         setOpen(false)
-                                        setUpdate(!update)
                                     }
                                 })
                         }}>
